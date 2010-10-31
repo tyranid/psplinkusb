@@ -1,1 +1,5 @@
 PC side of the PSP USB Host filing system, read the manual for further instructions.
+
+To build a winusb version use the command line make WINUSB_DEVICE=1. Then use the winusb driver
+from windows/winusb, this should work on 32bit or 64bit versions of windows with no driver signing
+issues

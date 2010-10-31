@@ -1,0 +1,98 @@
+[Version]
+Signature = "$Windows NT$"
+Class = USBHostFSClass
+ClassGuid={ADD27329-6B9E-4278-8840-610ED67F9F2D}
+Provider = %ProviderName%
+;CatalogFile=MyCatFile.cat
+
+; ========== Manufacturer/Models sections ===========
+
+[Manufacturer]
+%ProviderName% = USBHostFS_WinUSB,NTx86,NTamd64
+
+[USBHostFS_WinUSB.NTx86]
+%USB\USBHostFS.DeviceDesc% =USB_Install, USB\VID_054C&PID_01C9
+
+[USBHostFS_WinUSB.NTamd64]
+%USB\USBHostFS.DeviceDesc% =USB_Install, USB\VID_054C&PID_01C9
+
+; =================== Installation ===================
+
+;[1]
+[USB_Install]
+Include=winusb.inf
+Needs=WINUSB.NT
+
+;[2]
+[USB_Install.Services]
+Include=winusb.inf
+AddService=WinUSB,0x00000002,WinUSB_ServiceInstall
+
+;[3]
+[WinUSB_ServiceInstall]
+DisplayName     = %WinUSB_SvcDesc%
+ServiceType     = 1
+StartType       = 3
+ErrorControl    = 1
+ServiceBinary   = %12%\WinUSB.sys
+
+;[4]
+[USB_Install.Wdf]
+KmdfService=WINUSB, WinUsb_Install
+
+[WinUSB_Install]
+KmdfLibraryVersion=1.9
+
+;[5]
+[USB_Install.HW]
+AddReg=Dev_AddReg
+
+[Dev_AddReg]
+HKR,,DeviceInterfaceGUIDs,0x10000,"{251FAB1C-C0D7-4536-9E58-8F7C6F6412E6}"
+;static const GUID <<name>> = { 0x251fab1c, 0xc0d7, 0x4536, { 0x9e, 0x58, 0x8f, 0x7c, 0x6f, 0x64, 0x12, 0xe6 } };
+
+;[6]
+[USB_Install.CoInstallers]
+AddReg=CoInstallers_AddReg
+CopyFiles=CoInstallers_CopyFiles
+
+[CoInstallers_AddReg]
+HKR,,CoInstallers32,0x00010000,"WdfCoInstaller01009.dll,WdfCoInstaller","WinUSBCoInstaller.dll"
+
+[CoInstallers_CopyFiles]
+WinUSBCoInstaller.dll
+WdfCoInstaller01009.dll
+
+[DestinationDirs]
+CoInstallers_CopyFiles=11
+
+[ClassInstall32]
+Addreg=USBHostFSClassReg
+
+[USBHostFSClassReg]
+HKR,,,0,%ClassName%
+HKR,,Icon,,-1
+
+; ================= Source Media Section =====================
+;[7]
+
+[SourceDisksNames]
+1 = %DISK_NAME%,,,\i386
+2 = %DISK_NAME%,,,\amd64
+
+[SourceDisksFiles.x86]
+WinUSBCoInstaller.dll=1
+WdfCoInstaller01009.dll=1
+
+[SourceDisksFiles.amd64]
+WinUSBCoInstaller.dll=2
+WdfCoInstaller01009.dll=2
+
+; =================== Strings ===================
+
+[Strings]
+ProviderName="USBHostFS"
+USB\USBHostFS.DeviceDesc="USBHostFS WinUSB Driver"
+WinUSB_SvcDesc="USBHostFS WinUSB Driver"
+DISK_NAME="USBHostFS Install Disk"
+ClassName="USBHostFSClass"
